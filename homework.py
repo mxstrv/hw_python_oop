@@ -129,6 +129,9 @@ def read_package(workout_name: str, training_data: list) -> Training:
     }
     if workout_name in trainings.keys():
         return trainings[workout_name](*training_data)
+    else:
+        print('Данный вид тренировки отсутствует.')
+        exit(1)
 
 
 def main(test_training: Training) -> None:
