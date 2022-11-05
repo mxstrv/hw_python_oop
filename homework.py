@@ -1,3 +1,10 @@
+class MissingTrainingException(Exception):
+    def __init__(self, message, errors):
+        super().__init__(message)
+        self.errors = errors
+        print(errors)
+
+
 class InfoMessage:
     """Информационное сообщение о тренировке."""
 
@@ -33,9 +40,6 @@ class Training:
         self.duration = duration
         self.weight = weight
 
-    def __str__(self):
-        return 'Training'
-
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
         return self.action * self.LEN_STEP / self.M_IN_KM
@@ -46,11 +50,10 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
-        return InfoMessage(self.__str__(), self.duration, self.get_distance(),
+        return InfoMessage(type(self).__name__, self.duration, self.get_distance(),
                            self.get_mean_speed(), self.get_spent_calories())
 
 
@@ -58,12 +61,6 @@ class Running(Training):
     """Тренировка: бег."""
     CALORIES_MEAN_SPEED_MULTIPLIER = 18
     CALORIES_MEAN_SPEED_SHIFT = 1.79
-
-    def __init__(self, action, duration, weight):
-        super().__init__(action, duration, weight)
-
-    def __str__(self):
-        return 'Running'
 
     def get_spent_calories(self) -> float:
         return ((self.CALORIES_MEAN_SPEED_MULTIPLIER * self.get_mean_speed()
@@ -82,9 +79,6 @@ class SportsWalking(Training):
     def __init__(self, action, duration, weight, height: float):
         super().__init__(action, duration, weight)
         self.height = height
-
-    def __str__(self):
-        return 'SportsWalking'
 
     def get_spent_calories(self) -> float:
         return (self.CALORIES_WEIGHT_MULTIPLIER * self.weight
@@ -107,9 +101,6 @@ class Swimming(Training):
         self.length_pool = length_pool
         self.count_pool = count_pool
 
-    def __str__(self):
-        return 'Swimming'
-
     def get_mean_speed(self) -> float:
         return (self.length_pool * self.count_pool / self.M_IN_KM
                 / self.duration)
@@ -122,16 +113,15 @@ class Swimming(Training):
 
 def read_package(workout_name: str, training_data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trainings = {
+    training_abbreviations = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
     }
-    if workout_name in trainings.keys():
-        return trainings[workout_name](*training_data)
+    if workout_name in training_abbreviations:
+        return training_abbreviations[workout_name](*training_data)
     else:
-        print('Данный вид тренировки отсутствует.')
-        exit(1)
+        raise MissingTrainingException('Вид тренировки не найден!', 'Ошибка')
 
 
 def main(test_training: Training) -> None:
