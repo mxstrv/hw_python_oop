@@ -7,9 +7,6 @@ class MissingTrainingException(Exception):
     несуществующий вид тренировки в read_package.
     """
 
-    def __init__(self, message):
-        self.message = message
-
 
 @dataclass
 class InfoMessage:
