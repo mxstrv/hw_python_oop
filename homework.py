@@ -2,10 +2,13 @@ from dataclasses import dataclass
 
 
 class MissingTrainingException(Exception):
-    def __init__(self, message, errors):
-        super().__init__(message)
-        self.errors = errors
-        print(errors)
+    """
+    Объект исключения, возникающий при попытке передать
+    несуществующий вид тренировки в read_package.
+    """
+
+    def __init__(self, message):
+        self.message = message
 
 
 @dataclass
@@ -85,8 +88,8 @@ class SportsWalking(Training):
 
     def get_spent_calories(self) -> float:
         return (self.CALORIES_WEIGHT_MULTIPLIER * self.weight
-                + (((self.get_mean_speed() * self.KMH_IN_MSEC) ** 2)
-                   / (self.height / self.CM_IN_M))
+                + (self.get_mean_speed() * self.KMH_IN_MSEC) ** 2
+                / (self.height / self.CM_IN_M)
                 * self.CALORIES_SPEED_HEIGHT_MULTIPLIER
                 * self.weight) * self.duration * self.MIN_IN_H
 
@@ -124,7 +127,7 @@ def read_package(workout_name: str, training_data: list) -> Training:
     if workout_name in training_abbreviations:
         return training_abbreviations[workout_name](*training_data)
     else:
-        raise MissingTrainingException('Вид тренировки не найден!', 'Ошибка')
+        raise MissingTrainingException('Ошибка, вид тренировки не найден!')
 
 
 def main(test_training: Training) -> None:
